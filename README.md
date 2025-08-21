@@ -1,499 +1,209 @@
-# 🔧 Digital Board Simulator - BIN/7SEG Edition
+# Basic Logic Circuit Simulator
 
-[![Version](https://img.shields.io/badge/version-3.0-blue.svg)](https://github.com/Ahmad-Herzalla0/digital-board-simulator)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![CSS3](https://img.shields.io/badge/CSS3-Modern-1572B6.svg)](https://www.w3.org/Style/CSS/)
-[![HTML5](https://img.shields.io/badge/HTML5-E34F26.svg)](https://html.spec.whatwg.org/)
+A comprehensive digital logic circuit simulator built with HTML5, CSS3, and JavaScript. This interactive web application allows users to design, simulate, and test digital logic circuits with various components including basic gates, flip-flops, comparators, and display units.
 
-> **An advanced interactive digital logic circuit simulator with comprehensive BIN/7SEG display support, featuring real-time signal propagation and intuitive visual design.**
+## 🚀 Features
 
-![Digital Board Simulator Banner](assets/banner.png)
+### Core Components
+- **Logic Gates**: AND, OR, XOR, XNOR, NOT, AB+CD
+- **Flip-Flops**: JK Flip-Flop with T-mode support, D Flip-Flop
+- **Arithmetic**: 4-bit Adder, 4-bit Comparator, Basic Comparator
+- **Power Sources**: HIGH and LOW constant sources
+- **Input/Output**: Interactive inputs, LEDs, 7-segment displays
+- **Signal Sources**: Pulse generators with normal and fast modes
 
-## 🌟 Key Features
+### Advanced Features
+- **Wire Bridging**: Connect multiple points to share signals
+- **Internal Bridging**: Connect inputs within the same gate
+- **T Flip-Flop Mode**: Automatic detection when J and K are bridged
+- **Visual Feedback**: Color-coded wires (HIGH=green, LOW=gray)
+- **Real-time Simulation**: Instant propagation of signal changes
+- **Debug Tools**: Comprehensive debugging and testing functions
 
-- **🎯 25 Logic Gates** - Complete set including AND, OR, XOR, XNOR, NOT, AB+CD, 4-bit Adders, and Comparators
-- **📟 BIN/7SEG Display** - Triple 7-segment display with BCD and direct segment control
-- **⚡ Real-time Simulation** - Instant signal propagation with visual feedback
-- **🔌 Interactive Wiring** - Drag-and-drop connection system with state visualization
-- **💾 Save/Load System** - Configuration persistence with URL sharing capability
-- **📱 Responsive Design** - Works seamlessly across desktop and mobile devices
-- **🎨 Modern UI** - Clean, intuitive interface with smooth animations
-
-## 🚀 Quick Start
+## 🎯 Getting Started
 
 ### Prerequisites
-
-- Modern web browser (Chrome 80+, Firefox 75+, Safari 13+, Edge 80+)
-- No additional installations required - runs entirely in the browser
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- No additional software installation required
 
 ### Installation
+1. Clone or download the repository
+2. Open `index.html` in your web browser
+3. Start building circuits immediately!
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Ahmad-Herzalla0/digital-board-simulator.git
-   cd digital-board-simulator
-   ```
+### Basic Usage
+1. **Add Components**: Click on component buttons to add them to the canvas
+2. **Make Connections**: Click on connection points and drag to create wires
+3. **Toggle Inputs**: Click on input components to change their state
+4. **Observe Outputs**: Watch LEDs and displays respond to circuit changes
 
-2. **Open in browser:**
-   ```bash
-   # Option 1: Direct file opening
-   open index.html
-   
-   # Option 2: Local server (recommended)
-   python -m http.server 8000
-   # Then navigate to http://localhost:8000
-   ```
+## 🔧 Component Details
 
-3. **Start simulating!**
-   - Toggle input switches to HIGH/LOW
-   - Click connection points to create wires
-   - Watch signals propagate in real-time
+### Logic Gates
+- **AND Gate**: Output HIGH when all inputs are HIGH
+- **OR Gate**: Output HIGH when any input is HIGH
+- **XOR Gate**: Output HIGH when odd number of inputs are HIGH
+- **NOT Gate**: Inverts the input signal
 
-## 🧩 Components Overview
+### Flip-Flops
+- **JK Flip-Flop**: 
+  - Standard JK operation with Set, Reset, Clock inputs
+  - **T-Mode**: Automatically detected when J and K are internally bridged
+  - Edge-triggered on rising clock edge
+- **D Flip-Flop**: Data is latched on rising clock edge
 
-### Input Section (8 Inputs)
-- **Switches**: IN0 through IN7 with HIGH/LOW toggle
-- **Outputs**: Each input provides both Q and Q̅ signals
-- **Visual Feedback**: Color-coded state indication
+### Arithmetic Components
+- **4-bit Adder**: Adds two 4-bit numbers with carry input/output
+- **4-bit Comparator**: Compares two 4-bit numbers
+  - **> input**: Requires LOW to enable P>Q output
+  - **< input**: Requires LOW to enable P<Q output  
+  - **= input**: Requires HIGH to enable P=Q output
 
-### Logic Gates (25 Total)
+## 🌉 Wire Bridging System
 
-#### Column 1: AND Gates (7 units)
-- **Gates**: AND0 through AND6
-- **Function**: Output HIGH when all inputs are HIGH
-- **Inputs**: 4 inputs per gate (A, B, C, D)
-
-#### Column 2: OR Gates (5 units)  
-- **Gates**: OR0 through OR4
-- **Function**: Output HIGH when any input is HIGH
-- **Inputs**: 4 inputs per gate (A, B, C, D)
-
-#### Column 3: Special Gates (5 units)
-- **AB+CD Gates**: 3 units implementing (A∧B)∨(C∧D) logic
-- **XOR Gate**: Exclusive OR operation
-- **XNOR Gate**: Exclusive NOR operation
-
-#### Column 4: Advanced Components (6 units)
-- **NOT Gates**: 2 inverter gates
-- **4-bit Adders**: 2 units with carry support (A0-A3, B0-B3, Cin → S0-S3, CO)
-- **4-bit Comparator**: 1 unit with cascade inputs (A0-A3, B0-B3, >, <, = → P>Q, P=Q, P<Q)
-- **Basic Comparator**: 1 unit for simple comparison (P, Q → P>Q, P=Q, P<Q)
-- **Power Rails**: 2 units providing constant HIGH and LOW signals
-
-### Output Section
-
-#### LEDs (12 Indicators)
-- **Labels**: L0 through L11
-- **Visual States**: Off (dark) / On (glowing red)
-- **Real-time Updates**: Instant response to signal changes
-
-#### BIN/7SEG Display
-- **Display 1**: BCD controlled (inputs: 1, 2, 4, 8)
-- **Display 2**: BCD controlled (inputs: 1, 2, 4, 8)  
-- **Display 3**: Direct segment control (inputs: a, b, c, d, e, f, g)
-- **Automatic Conversion**: BCD to 7-segment pattern mapping
-- **Hexadecimal Support**: Displays 0-F characters
-
-## 🎮 User Interface Guide
-
-### Navigation Layout
+### External Bridging
+Connect multiple sources (inputs, outputs) to share signals:
 ```
-┌─────────────┬──────────────────────────────────────┬─────────────┐
-│   INPUTS    │            LOGIC GATES               │    LEDS     │
-│   (8 units) │     (25 gates in 4 columns)        │  (12 units) │
-│             │                                      │             │
-│ IN0 ○ LOW   │  AND  │  OR   │ Special │ Advanced  │   L0  ○     │
-│ IN1 ○ LOW   │  AND  │  OR   │   XOR   │ 4bitADD   │   L1  ○     │
-│ IN2 ○ LOW   │  AND  │  OR   │  XNOR   │ 4bitCMP   │   L2  ○     │
-│ IN3 ○ LOW   │  AND  │  OR   │ AB+CD   │   NOT     │   L3  ○     │
-│ IN4 ○ LOW   │  AND  │  OR   │ AB+CD   │  POWER    │   L4  ○     │
-│ IN5 ○ LOW   │  AND  │       │ AB+CD   │           │   ...       │
-│ IN6 ○ LOW   │  AND  │       │         │           │   L11 ○     │
-│ IN7 ○ LOW   │  AND  │       │         │           │             │
-│             │       │       │         │           │ ┌─────────┐ │
-│             │       │       │         │           │ │BIN/7SEG │ │
-│             │       │       │         │           │ │ ███ ███ │ │
-│             │       │       │         │           │ │ ███ ███ │ │
-│             │       │       │         │           │ └─────────┘ │
-└─────────────┴──────────────────────────────────────┴─────────────┘
+INPUT_A ←→ PULSE_1 ←→ GATE_OUTPUT
 ```
 
-### Interaction Methods
-
-#### 🖱️ Mouse Controls
-- **Single Click**: Toggle input switches
-- **Click & Release**: Start/complete wire connections
-- **Hover**: Highlight connection points and show tooltips
-- **Right Click**: Context menu for wire deletion
-
-#### ⌨️ Keyboard Shortcuts
-- **F1**: Show help dialog
-- **Ctrl+S**: Save current configuration
-- **Ctrl+L**: Load configuration
-- **Escape**: Cancel current wire connection
-- **Space**: Quick toggle for selected input
-- **Delete**: Remove selected wire
-
-#### 🔌 Connection System
-1. **Start Connection**: Click on any output point (circles)
-2. **Route Wire**: Move mouse to desired destination
-3. **Complete Connection**: Click on input point
-4. **Visual Feedback**: Wire color indicates signal state
-   - **Green (thick)**: HIGH signal
-   - **Gray (thin)**: LOW signal
-   - **Yellow (dashed)**: Temporary connection
-
-## ⚙️ Advanced Features
-
-### 💾 Save & Load System
-
-#### Auto-Save
-- **Frequency**: Every 5 minutes
-- **Storage**: Browser localStorage
-- **Recovery**: Automatic restoration on page reload
-
-#### Manual Save/Load
-```javascript
-// Save configuration
-const config = saveLoadManager.createConfigurationData();
-localStorage.setItem('my_circuit', JSON.stringify(config));
-
-// Load configuration
-const savedConfig = JSON.parse(localStorage.getItem('my_circuit'));
-saveLoadManager.applyConfiguration(savedConfig);
+### Internal Bridging
+Connect inputs within the same gate for special behaviors:
+```
+JK_FF: J ←→ K  (Creates T Flip-Flop mode)
+AND_GATE: A ←→ B  (Both inputs share same signal)
 ```
 
-#### Export Formats
-- **JSON File**: Complete circuit configuration
-- **URL Sharing**: Compressed circuit data in URL parameters
-- **Image Export**: Circuit layout as PNG (planned feature)
+### Visual Indicators
+- **Normal Wire**: Solid line (green=HIGH, gray=LOW)
+- **External Bridge**: Dashed line with pulse animation
+- **Internal Bridge**: Orange dashed line with special animation
+- **T-Mode Bridge**: Distinct orange color for J↔K connections
 
-### 🔄 Signal Propagation
+## 🧪 Debug & Testing
 
-#### Real-time Updates
-- **Propagation Delay**: < 10ms for typical circuits
-- **Chain Reactions**: Automatic cascade updates
-- **Feedback Loops**: Proper handling of circular dependencies
-- **State Consistency**: Guaranteed stable final states
+Open browser console (F12) and use these commands:
 
-#### Algorithm Overview
-```javascript
-// Simplified propagation flow
-1. Input Change Detection
-2. Connected Component Identification  
-3. Topological Sort for Update Order
-4. Gate Logic Evaluation
-5. Output State Updates
-6. Visual Refresh
+### Basic Debug
+- `debugConnections()` - Show all connections and states
+- `checkWireVisuals()` - Inspect wire colors and states
+- `clearDebug()` - Clear console
+
+### Feature Testing
+- `testBridging()` - Test wire bridging functionality
+- `testInternalBridge()` - Test internal gate bridging
+- `testTFlipFlop()` - Test T Flip-Flop mode automatically
+- `testCOMP4BIT()` - Test 4-bit comparator logic
+- `testRecursionFix()` - Verify infinite recursion fix
+- `testConnectionDeletion()` - Test bridge persistence
+
+## 🏗️ Architecture
+
+### Core Classes
+- **StateManager**: Manages component states and signal propagation
+- **ConnectionManager**: Handles wire creation and deletion
+- **WireManager**: Manages visual wire rendering and updates
+- **ComponentFactory**: Creates and manages circuit components
+- **UIManager**: Handles user interface interactions
+
+### Key Features Implementation
+- **Recursion Protection**: Prevents infinite loops in signal propagation
+- **Bidirectional Propagation**: Signals flow in both directions through bridges
+- **Edge Detection**: Proper rising-edge triggering for flip-flops
+- **State Persistence**: Maintains circuit state during operations
+
+## 📁 Project Structure
+
 ```
-
-### 🎨 Visual Feedback System
-
-#### State Indicators
-- **Connection Points**: 
-  - Black: Disconnected
-  - Green: Connected (HIGH)
-  - Red: Connected (LOW)
-  - Yellow: Currently connecting
-
-- **Wires**:
-  - Thickness indicates signal strength
-  - Color shows current state
-  - Animation shows signal flow direction
-
-- **Components**:
-  - Glow effects for active gates
-  - Pulsing for changing states
-  - Smooth transitions between states
-
-## 🏗️ Technical Architecture
-
-### 📁 Project Structure
-```
-digital-board-simulator/
-├── index.html                 # Main application entry point
-├── js/                        # JavaScript modules
-│   ├── main.js               # Application initialization
-│   ├── config.js             # Configuration constants
-│   ├── state-manager.js      # State management and logic
-│   ├── component-factory.js  # Component creation and rendering
+Basic-Logic-Circuit/
+├── index.html              # Main application page
+├── README.md              # This file
+├── js/
+│   ├── config.js          # Configuration constants
+│   ├── state-manager.js   # Core state management
 │   ├── connection-manager.js # Wire connection handling
-│   ├── wire-manager.js       # SVG wire drawing and management
-│   └── save-load-manager.js  # Persistence and sharing
-├── styles/                   # CSS stylesheets
-│   ├── main.css             # Layout and base styles
-│   ├── components.css       # Component-specific styles
-│   └── animations.css       # Animations and transitions
-├── assets/                  # Static resources
-│   ├── icons/              # UI icons and symbols
-│   └── screenshots/        # Documentation images
-└── README.md               # This documentation
+│   ├── wire-manager.js    # Visual wire management
+│   ├── component-factory.js # Component creation
+│   ├── ui-manager.js      # User interface
+│   └── main.js           # Application initialization
+├── styles/
+│   ├── main.css          # Main styles
+│   ├── components.css    # Component-specific styles
+│   └── animations.css    # Animation definitions
+└── assets/               # Images and other assets
 ```
 
-### 🧠 Core Classes
+## 🎨 Styling
 
-#### StateManager
-```javascript
-class StateManager {
-    // Manages overall application state
-    - inputs: Array<InputState>
-    - gates: Array<GateState>  
-    - leds: Array<LEDState>
-    - bin7segs: Array<DisplayState>
-    - connections: Array<Connection>
-    
-    + toggleInput(id): boolean
-    + updateGateInput(gateId, inputType, state): void
-    + propagateState(target, state): void
-}
-```
+The application uses modern CSS with:
+- **Flexbox Layout**: Responsive component arrangement
+- **CSS Grid**: Structured canvas layout
+- **CSS Animations**: Wire state transitions and pulse effects
+- **Custom Properties**: Consistent color scheme and spacing
 
-#### ComponentFactory
-```javascript
-class ComponentFactory {
-    // Creates and manages UI components
-    + createInput(id): HTMLElement
-    + createGate(id): HTMLElement
-    + createLED(id): HTMLElement
-    + createBin7Seg(id): HTMLElement
-    + updateVisuals(): void
-}
-```
+## 🔄 Signal Propagation
 
-#### ConnectionManager
-```javascript
-class ConnectionManager {
-    // Handles wire connections and interactions
-    + handleConnectionClick(event, type, id, pointType): void
-    + validateConnection(from, to): boolean
-    + deleteConnection(from, to): boolean
-}
-```
+### Standard Flow
+1. User toggles input → State change detected
+2. StateManager updates connected elements
+3. Signal propagates through wires
+4. Target components update their states
+5. Visual feedback updates immediately
 
-### 🔧 Key Algorithms
+### Bridge Propagation
+1. Signal applied to one bridge point
+2. Bidirectional propagation to all connected points
+3. Internal bridges update gate behavior
+4. Special handling for T-mode flip-flops
 
-#### Gate Logic Evaluation
-```javascript
-calculateGateOutput(gate) {
-    switch(gate.type) {
-        case 'AND': return inputs.every(i => i === true);
-        case 'OR': return inputs.some(i => i === true);
-        case 'XOR': return inputs.filter(i => i).length % 2 === 1;
-        case 'ADDER_4BIT': return calculate4BitSum(gate.inputs);
-        // ... additional gate types
-    }
-}
-```
+## 🐛 Known Issues & Solutions
 
-#### BCD to 7-Segment Conversion
-```javascript
-const BCD_TO_7SEG = {
-    0: {a:1, b:1, c:1, d:1, e:1, f:1, g:0}, // Display "0"
-    1: {a:0, b:1, c:1, d:0, e:0, f:0, g:0}, // Display "1"
-    // ... patterns for 2-F
-};
-```
+### Issue: Infinite Recursion
+**Fixed**: Added recursion protection in `updateGateInput()` and `propagateGateInputBridge()`
 
-## 🌐 Browser Compatibility
+### Issue: Bridge State Loss
+**Fixed**: Implemented `reevaluateInternalBridges()` to maintain state after deletions
 
-| Browser | Minimum Version | Recommended | Notes |
-|---------|----------------|-------------|-------|
-| Chrome | 80+ | 90+ | Full feature support |
-| Firefox | 75+ | 85+ | Full feature support |
-| Safari | 13+ | 14+ | Full feature support |
-| Edge | 80+ | 90+ | Full feature support |
-| Mobile Safari | 13+ | 14+ | Touch-optimized |
-| Chrome Mobile | 80+ | 90+ | Touch-optimized |
-
-### Required Features
-- **ES6+ Support**: Classes, arrow functions, template literals
-- **SVG Support**: For wire rendering
-- **Local Storage**: For save/load functionality
-- **CSS Grid**: For responsive layout
-- **Touch Events**: For mobile interaction
-
-## 🎯 Usage Examples
-
-### Basic Circuit Creation
-```javascript
-// Example: Create an AND gate circuit
-1. Toggle IN0 to HIGH
-2. Toggle IN1 to HIGH  
-3. Connect IN0-Q to AND0-A
-4. Connect IN1-Q to AND0-B
-5. Connect AND0-Q to L0
-6. Result: L0 lights up (HIGH output)
-```
-
-### BCD Counter Display
-```javascript
-// Example: 4-bit BCD counter
-1. Connect IN0 to BIN/7SEG-1 input
-2. Connect IN1 to BIN/7SEG-2 input
-3. Connect IN2 to BIN/7SEG-4 input
-4. Connect IN3 to BIN/7SEG-8 input
-5. Toggle inputs to count: 0000→0001→0010→...→1111
-6. Watch display show: 0→1→2→...→F
-```
-
-### 4-bit Adder Circuit
-```javascript
-// Example: Add two 4-bit numbers
-1. Set first number on IN0-IN3 (A inputs)
-2. Set second number on IN4-IN7 (B inputs)
-3. Connect inputs to ADD0 A0-A3 and B0-B3
-4. Connect ADD0 outputs S0-S3 to LEDs L0-L3
-5. Connect CO (carry out) to L4
-6. Result shows sum with carry indication
-```
+### Issue: Visual Sync Problems
+**Fixed**: Enhanced wire visual update system with explicit state management
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how to get started:
-
-### Development Setup
-```bash
-# 1. Fork and clone the repository
-git clone https://github.com/your-username/digital-board-simulator.git
-cd digital-board-simulator
-
-# 2. Create a feature branch
-git checkout -b feature/your-feature-name
-
-# 3. Make your changes
-# Edit files using your preferred editor
-
-# 4. Test thoroughly
-# Open index.html in multiple browsers
-
-# 5. Commit and push
-git add .
-git commit -m "Add your feature description"
-git push origin feature/your-feature-name
-
-# 6. Create a Pull Request
-```
-
-### Code Style Guidelines
-
-#### JavaScript
-```javascript
-// Use ES6+ features
-class MyClass {
-    constructor(param) {
-        this.param = param;
-    }
-    
-    // Use arrow functions for short methods
-    shortMethod = () => this.param * 2;
-    
-    // Use descriptive variable names
-    calculateGateOutput(inputSignals) {
-        return inputSignals.every(signal => signal === true);
-    }
-}
-```
-
-#### CSS
-```css
-/* Use BEM methodology for class names */
-.component-name {
-    /* Properties in logical order */
-    display: flex;
-    position: relative;
-    
-    /* Dimensions */
-    width: 100px;
-    height: 50px;
-    
-    /* Colors */
-    background: #333;
-    color: white;
-    
-    /* Effects */
-    transition: all 0.3s ease;
-}
-
-.component-name__element {
-    /* Child elements */
-}
-
-.component-name--modifier {
-    /* Modifier variations */
-}
-```
-
-### Issue Reporting
-When reporting bugs, please include:
-- Browser version and operating system
-- Steps to reproduce the issue
-- Expected vs actual behavior
-- Console error messages (if any)
-- Screenshots or video recordings
-
-### Feature Requests
-For new features, please provide:
-- Clear description of the functionality
-- Use cases and benefits
-- Mockups or diagrams (if applicable)
-- Compatibility considerations
-
-## 📊 Performance Specifications
-
-### Typical Performance Metrics
-- **Initial Load Time**: < 2 seconds
-- **Component Rendering**: < 100ms for complete redraw
-- **Signal Propagation**: < 10ms for 25-gate circuit
-- **Memory Usage**: ~15MB typical, ~30MB maximum
-- **Supported Circuit Size**: Up to 1000 connections
-
-### Optimization Features
-- **Lazy Rendering**: Components rendered only when visible
-- **Event Debouncing**: Prevents excessive updates during rapid input
-- **State Caching**: Minimizes redundant calculations
-- **SVG Optimization**: Efficient wire rendering with culling
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly using debug functions
+5. Submit a pull request
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is open source and available under the [MIT License](LICENSE).
 
-```
-MIT License
+## 🎓 Educational Use
 
-Copyright (c) 2024 Ahmad Herzalla
+This simulator is perfect for:
+- **Digital Logic Courses**: Hands-on circuit design
+- **Computer Engineering**: Understanding flip-flops and counters  
+- **Self-Learning**: Interactive exploration of digital concepts
+- **Prototyping**: Quick testing of logic designs
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 🔮 Future Enhancements
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+- [ ] Circuit save/load functionality
+- [ ] More complex components (multiplexers, decoders)
+- [ ] Timing diagram visualization
+- [ ] Circuit optimization suggestions
+- [ ] Mobile device support
+- [ ] Collaborative editing features
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-```
+## 📞 Support
 
-## 🙏 Acknowledgments
-
-- **Inspiration**: Digital logic courses and educational simulators
-- **Icons**: Open source icon libraries
-- **Testing**: Community feedback and contributions
-- **Documentation**: Influenced by best practices from major open source projects
-
-## 🔗 Links
-
-- **Demo**: [Live Application](https://ahmad-herzalla0.github.io/digital-board-simulator)
-- **Issues**: [Bug Reports & Features](https://github.com/Ahmad-Herzalla0/digital-board-simulator/issues)
-- **Discussions**: [Community Forum](https://github.com/Ahmad-Herzalla0/digital-board-simulator/discussions)
-- **Wiki**: [Extended Documentation](https://github.com/Ahmad-Herzalla0/digital-board-simulator/wiki)
+For questions, issues, or contributions, please:
+1. Check existing issues in the repository
+2. Use debug functions to diagnose problems
+3. Create detailed issue reports with steps to reproduce
+4. Include browser and version information
 
 ---
 
-**Made with ❤️ for digital logic education and experimentation**
-
-*Last updated: January 2024*
+**Happy Circuit Building!** 🔌⚡

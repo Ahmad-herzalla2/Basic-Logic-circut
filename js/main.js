@@ -167,6 +167,82 @@ window.clearDebug = () => {
     console.log('🧹 Debug console cleared. Use testBridging() for testing instructions.');
 };
 
+// Test recursion fix
+window.testRecursionFix = () => {
+    console.log('🧪 Testing recursion fix...');
+    
+    // Add a JK Flip-Flop
+    if (window.componentFactory && window.stateManager) {
+        const jkFF = window.componentFactory.createComponent('JK_FF', 100, 100);
+        console.log('✅ JK Flip-Flop created');
+        
+        // Try to create an internal bridge J ↔ K
+        const jInput = { type: 'gate-input', id: jkFF.id, inputType: 'J' };
+        const kInput = { type: 'gate-input', id: jkFF.id, inputType: 'K' };
+        
+        // Add connection
+        window.stateManager.addConnection(jInput, kInput);
+        console.log('✅ Internal bridge J ↔ K created');
+        
+        // Try to update J input (this should not cause infinite recursion)
+        console.log('🔧 Testing updateGateInput...');
+        window.stateManager.updateGateInput(jkFF.id, 'J', true);
+        console.log('✅ updateGateInput completed without recursion');
+        
+        console.log('🎉 Recursion fix test passed!');
+    } else {
+        console.log('❌ Required managers not available');
+    }
+};
+
+// Test COMP_4BIT new logic
+window.testCOMP4BIT = () => {
+    console.log('🧪 Testing COMP_4BIT new logic...');
+    console.log('');
+    
+    if (window.componentFactory && window.stateManager) {
+        // Create COMP_4BIT
+        const comp = window.componentFactory.createComponent('COMP_4BIT', 200, 200);
+        console.log('✅ COMP_4BIT created');
+        
+        // Set P=5 (binary: 0101)
+        window.stateManager.updateGateInput(comp.id, 'A0', true);  // bit 0 = 1
+        window.stateManager.updateGateInput(comp.id, 'A1', false); // bit 1 = 0
+        window.stateManager.updateGateInput(comp.id, 'A2', true);  // bit 2 = 1
+        window.stateManager.updateGateInput(comp.id, 'A3', false); // bit 3 = 0
+        
+        // Set Q=3 (binary: 0011)
+        window.stateManager.updateGateInput(comp.id, 'B0', true);  // bit 0 = 1
+        window.stateManager.updateGateInput(comp.id, 'B1', true);  // bit 1 = 1
+        window.stateManager.updateGateInput(comp.id, 'B2', false); // bit 2 = 0
+        window.stateManager.updateGateInput(comp.id, 'B3', false); // bit 3 = 0
+        
+        console.log('✅ Set P=5, Q=3 (P > Q is true)');
+        
+        // Test > input with LOW (should enable P>Q output)
+        console.log('');
+        console.log('🔧 Testing > input with LOW:');
+        window.stateManager.updateGateInput(comp.id, '>', false); // LOW = enable
+        console.log('Expected: P>Q should be HIGH');
+        
+        // Test > input with HIGH (should disable P>Q output) 
+        console.log('');
+        console.log('🔧 Testing > input with HIGH:');
+        window.stateManager.updateGateInput(comp.id, '>', true); // HIGH = disable
+        console.log('Expected: P>Q should be LOW');
+        
+        console.log('');
+        console.log('📋 New COMP_4BIT Logic:');
+        console.log('- > input needs LOW to enable P>Q output');
+        console.log('- < input needs LOW to enable P<Q output'); 
+        console.log('- = input needs HIGH to enable P=Q output');
+        console.log('');
+        console.log('🎉 COMP_4BIT test completed!');
+    } else {
+        console.log('❌ Required managers not available');
+    }
+};
+
 // 🎨 دالة لفحص جميع الأسلاك البصرية
 window.checkWireVisuals = () => {
     console.log('🎨 Checking all wire visuals...');

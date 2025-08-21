@@ -8,6 +8,7 @@ class StateManager {
         this.connections = [];
         this.currentConnection = null;
         this.listeners = {};
+        this.updateInProgress = new Set(); // ⭐ إضافة حماية من التكرار اللانهائي
     }
 
     on(event, callback) {
@@ -45,21 +46,31 @@ class StateManager {
         const gate = this.gates[gateId];
         if (!gate) return;
 
-        const inputIndex = this.getInputIndex(inputType, gate.type);
-        if (inputIndex !== -1 && inputIndex < gate.inputs.length) {
-            console.log(`🔧 DEBUG: Setting gate ${gateId} input ${inputType}[${inputIndex}] = ${state}`);
-            gate.inputs[inputIndex] = state;
-            gate.connected[inputIndex] = true;
-            
-            // ⭐ إذا تم تحديث مدخل، تحقق من الجسور الداخلية وحدث الأسلاك
-            this.propagateGateInputBridge(gateId, inputType, state);
-            this.updateInternalWireVisuals(gateId, inputType, state);
+        // ⭐ حماية من التكرار اللانهائي
+        const updateKey = `gate-${gateId}-${inputType}`;
+        if (this.updateInProgress.has(updateKey)) {
+            console.log(`🔄 DEBUG: Update already in progress for ${updateKey}, skipping to prevent recursion`);
+            return;
         }
-
-        const newOutput = this.calculateGateOutput(gate);
-        console.log(`📊 DEBUG: Gate ${gateId} calculated output: ${newOutput} (inputs: [${gate.inputs.join(', ')}])`);
         
-        if (gate.type === 'ADDER_4BIT') {
+        this.updateInProgress.add(updateKey);
+        
+        try {
+            const inputIndex = this.getInputIndex(inputType, gate.type);
+            if (inputIndex !== -1 && inputIndex < gate.inputs.length) {
+                console.log(`🔧 DEBUG: Setting gate ${gateId} input ${inputType}[${inputIndex}] = ${state}`);
+                gate.inputs[inputIndex] = state;
+                gate.connected[inputIndex] = true;
+                
+                // ⭐ إذا تم تحديث مدخل، تحقق من الجسور الداخلية وحدث الأسلاك
+                this.propagateGateInputBridge(gateId, inputType, state);
+                this.updateInternalWireVisuals(gateId, inputType, state);
+            }
+
+            const newOutput = this.calculateGateOutput(gate);
+            console.log(`📊 DEBUG: Gate ${gateId} calculated output: ${newOutput} (inputs: [${gate.inputs.join(', ')}])`);
+            
+            if (gate.type === 'ADDER_4BIT') {
             gate.output = newOutput;
             this.emit(CONFIG.EVENTS.STATE_UPDATE, {
                 type: 'gate',
@@ -124,6 +135,11 @@ class StateManager {
             this.updateConnectedElements(gateId, 'gate-output');
             this.propagateGateOutputSignal(gateId, 'q');
             this.propagateGateOutputSignal(gateId, 'q_not');
+        }
+        
+        } finally {
+            // ⭐ إزالة مفتاح التحديث من المجموعة بعد انتهاء العملية
+            this.updateInProgress.delete(updateKey);
         }
     }
 
@@ -291,23 +307,27 @@ class StateManager {
                 const isEqual = P_value === Q_value;
                 const isLess = P_value < Q_value;
                 
-                const greaterInput = gate.connected[8] ? gate.inputs[8] : false;
-                const lessInput = gate.connected[9] ? gate.inputs[9] : false;
-                const equalInput = gate.connected[10] ? gate.inputs[10] : false;
+                // ⭐ المنطق المحدث: > و < يحتاجان LOW، = يحتاج HIGH
+                const greaterInput = gate.connected[8] ? gate.inputs[8] : true; // افتراضي HIGH (معطل)
+                const lessInput = gate.connected[9] ? gate.inputs[9] : true; // افتراضي HIGH (معطل)  
+                const equalInput = gate.connected[10] ? gate.inputs[10] : false; // افتراضي LOW (معطل)
                 
                 let finalGreater = isGreater;
                 let finalEqual = isEqual;
                 let finalLess = isLess;
                 
                 if (gate.connected[8]) {
-                    finalGreater = isGreater && greaterInput;
+                    finalGreater = isGreater && !greaterInput; // LOW = مفعل
                 }
                 if (gate.connected[9]) {
-                    finalLess = isLess && lessInput;
+                    finalLess = isLess && !lessInput; // LOW = مفعل
                 }
                 if (gate.connected[10]) {
-                    finalEqual = isEqual && equalInput;
+                    finalEqual = isEqual && equalInput; // HIGH = مفعل
                 }
+                
+                console.log(`🔧 COMP4: P=${P_value}, Q=${Q_value}, >input=${greaterInput}, <input=${lessInput}, =input=${equalInput}`);
+                console.log(`🔧 COMP4: Results: P>Q=${finalGreater}, P=Q=${finalEqual}, P<Q=${finalLess}`);
                 
                 gate.outputs = {
                     'P>Q': finalGreater,
@@ -838,40 +858,65 @@ class StateManager {
     propagateGateInputBridge(gateId, inputType, state) {
         console.log(`🌉 DEBUG: Propagating bridged signal in gate ${gateId} from input ${inputType} with state ${state}`);
         
-        // ابحث عن جميع الاتصالات المباشرة بين مدخلات نفس البوابة
-        this.connections.forEach(conn => {
-            // تحقق من الاتصالات داخل نفس البوابة
-            if (conn.from.type === 'gate-input' && conn.from.id === gateId && 
-                conn.to.type === 'gate-input' && conn.to.id === gateId) {
-                
-                let targetInput = null;
-                
-                // إذا كان الاتصال من المدخل الحالي
-                if (conn.from.inputType === inputType) {
-                    targetInput = conn.to.inputType;
-                    console.log(`➡️ DEBUG: Found bridge FROM ${inputType} TO ${targetInput} in gate ${gateId}`);
-                }
-                // إذا كان الاتصال إلى المدخل الحالي
-                else if (conn.to.inputType === inputType) {
-                    targetInput = conn.from.inputType;
-                    console.log(`⬅️ DEBUG: Found bridge TO ${inputType} FROM ${targetInput} in gate ${gateId}`);
-                }
-                
-                if (targetInput && targetInput !== inputType) { // تجنب التكرار اللانهائي
-                    console.log(`✅ DEBUG: Applying bridged signal ${state} to gate ${gateId} input ${targetInput}`);
-                    // تحديث حالة المدخل المستهدف مباشرة
-                    this.updateGateInput(gateId, targetInput, state);
+        // ⭐ حماية من التكرار اللانهائي في انتشار الجسور الداخلية
+        const bridgeKey = `bridge-${gateId}-${inputType}`;
+        if (this.updateInProgress.has(bridgeKey)) {
+            console.log(`🔄 DEBUG: Bridge propagation already in progress for ${bridgeKey}, skipping`);
+            return;
+        }
+        
+        this.updateInProgress.add(bridgeKey);
+        
+        try {
+            // ابحث عن جميع الاتصالات المباشرة بين مدخلات نفس البوابة
+            this.connections.forEach(conn => {
+                // تحقق من الاتصالات داخل نفس البوابة
+                if (conn.from.type === 'gate-input' && conn.from.id === gateId && 
+                    conn.to.type === 'gate-input' && conn.to.id === gateId) {
                     
-                    // ⭐ تحديث الأسلاك الداخلية - تحديد الاتجاه الصحيح
-                    if (window.wireManager) {
-                        console.log(`🔌 DEBUG: Updating internal wire visual state to ${state}`);
-                        window.wireManager.updateWireState(conn.from, conn.to, state);
-                        // أيضاً تحديث في الاتجاه المعاكس للتأكد
-                        window.wireManager.updateWireState(conn.to, conn.from, state);
+                    let targetInput = null;
+                    
+                    // إذا كان الاتصال من المدخل الحالي
+                    if (conn.from.inputType === inputType) {
+                        targetInput = conn.to.inputType;
+                        console.log(`➡️ DEBUG: Found bridge FROM ${inputType} TO ${targetInput} in gate ${gateId}`);
+                    }
+                    // إذا كان الاتصال إلى المدخل الحالي
+                    else if (conn.to.inputType === inputType) {
+                        targetInput = conn.from.inputType;
+                        console.log(`⬅️ DEBUG: Found bridge TO ${inputType} FROM ${targetInput} in gate ${gateId}`);
+                    }
+                    
+                    if (targetInput && targetInput !== inputType) { // تجنب التكرار اللانهائي
+                        const targetBridgeKey = `bridge-${gateId}-${targetInput}`;
+                        if (!this.updateInProgress.has(targetBridgeKey)) {
+                            console.log(`✅ DEBUG: Applying bridged signal ${state} to gate ${gateId} input ${targetInput}`);
+                            
+                            // تحديث حالة المدخل المستهدف مباشرة (بدون استدعاء updateGateInput لتجنب التكرار)
+                            const gate = this.gates[gateId];
+                            if (gate) {
+                                const targetInputIndex = this.getInputIndex(targetInput, gate.type);
+                                if (targetInputIndex !== -1 && targetInputIndex < gate.inputs.length) {
+                                    gate.inputs[targetInputIndex] = state;
+                                    gate.connected[targetInputIndex] = true;
+                                }
+                            }
+                            
+                            // ⭐ تحديث الأسلاك الداخلية - تحديد الاتجاه الصحيح
+                            if (window.wireManager) {
+                                console.log(`🔌 DEBUG: Updating internal wire visual state to ${state}`);
+                                window.wireManager.updateWireState(conn.from, conn.to, state);
+                                // أيضاً تحديث في الاتجاه المعاكس للتأكد
+                                window.wireManager.updateWireState(conn.to, conn.from, state);
+                            }
+                        }
                     }
                 }
-            }
-        });
+            });
+        } finally {
+            // ⭐ إزالة مفتاح الجسر من المجموعة بعد انتهاء العملية
+            this.updateInProgress.delete(bridgeKey);
+        }
     }
 
     // ⭐ دالة للتحقق من وجود جسر داخلي بين مدخلين في نفس البوابة
